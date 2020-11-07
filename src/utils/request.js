@@ -2,8 +2,8 @@
 import axios from 'axios'
 
 const instance = axios.create({
-  baseURL: 'https://some-domain.com/api/',
-  timeout: 3000
+  baseURL: 'http://ttapi.research.itcast.cn',
+  timeout: 1000
 
 })
 export default instance
