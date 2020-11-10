@@ -5,9 +5,7 @@
         model属性=>el-form的数据源 对象
         label-width 宽度
         v-model="form.?" 表单元素双绑数据
-
      -->
-
     <el-form ref="form" :model="form" :rules="rules" class="login-form-wrap ">
       <!-- logo -->
       <div class="login-head">
@@ -38,8 +36,7 @@
 </template>
 
 <script>
-import request from '@/utils/request.js'
-
+import { postLogin } from '@/Api/user.js'
 export default {
   name: 'Login',
   data () {
@@ -117,26 +114,22 @@ export default {
     }
   },
   methods: {
-    onSubmit () {
-      console.log('submit!')
-      this.$refs.form.validate(async valid => {
-        if (valid) {
-          try {
-            await request({
-              url: '/mp/v1_0/authorizations',
-              method: 'POST',
-              data: { mobile: this.form.mobile, code: this.form.code }
-            })
-            this.$message.success('登录成功')
-            this.$router.push('/')
-          } catch (error) {
-            this.$message.error('登录失败')
-          }
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+    async onSubmit () {
+      try {
+        await this.$refs.form.validate()
+      } catch (error) {
+        return console.log('error submit!!')
+      }
+      try {
+        const res = await postLogin(this.form.mobile, this.form.code)
+        // res的返回结果为：res.data.data.token
+        console.log(res)
+        window.localStorage.setItem('hmpc-token', res.data.data.token)
+        this.$message.success('登录成功')
+        this.$router.push('/')
+      } catch (error) {
+        this.$message.error('登录失败')
+      }
     }
   }
 }
