@@ -6,22 +6,23 @@
     <div>
 
      <el-menu
-      default-active="1"
+     :default-active="$route.path"
+     :router="true"
       class="el-menu-vertical-demo"
       background-color="#002033"
       text-color="#fff"
       active-text-color="#ffd04b"
       :collapse="isCollapse"
       :collapse-transition="false">
-      <el-menu-item index="1">
+      <el-menu-item index="/">
         <i class="el-icon-s-home"></i>
         <span slot="title">首页</span>
       </el-menu-item>
-      <el-menu-item index="2">
+      <el-menu-item index="/articles">
        <i class="el-icon-document"></i>
         <span slot="title">内容管理</span>
       </el-menu-item>
-       <el-menu-item index="3">
+       <el-menu-item index="/pictrues">
        <i class="el-icon-picture"></i>
         <span slot="title">素材管理</span>
       </el-menu-item>
@@ -64,13 +65,16 @@
 
   </el-dropdown>
     </el-header>
-    <el-main>Main</el-main>
+    <el-main>
+      <router-view/>
+    </el-main>
   </el-container>
 </el-container>
   </div>
 </template>
 
 <script>
+import { removeToken } from '@/utils/storage'
 import { getUserInfo } from '@/Api/user.js'
 export default {
   name: 'Layout',
@@ -84,6 +88,20 @@ export default {
   async created () {
     const res = await getUserInfo()
     this.userInfo = res.data.data
+  },
+  methods: {
+    async logout () {
+      try {
+        await this.$confirm('是否确认推出账号？', '温馨提示', {
+          type: 'warning'
+        })
+        removeToken()
+        this.$router.push('/login')
+        this.$message('退出成功！')
+      } catch {
+        console.log('操作取消')
+      }
+    }
   }
 }
 </script>

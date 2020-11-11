@@ -36,7 +36,9 @@
 </template>
 
 <script>
-import { postLogin } from '@/Api/user.js'
+import { postLogin } from '@/Api/user'
+import { setToken } from '@/utils/storage'
+
 export default {
   name: 'Login',
   data () {
@@ -123,8 +125,8 @@ export default {
       try {
         const res = await postLogin(this.form.mobile, this.form.code)
         // res的返回结果为：res.data.data.token
+        setToken(res.data.data.token)
         console.log(res)
-        window.localStorage.setItem('hmpc-token', res.data.data.token)
         this.$message.success('登录成功')
         this.$router.push('/')
       } catch (error) {
