@@ -53,35 +53,40 @@
 <!-- 下表格 -->
     <el-card style="margin-top: 40px;">
       <!-- 表头 -->
-      <template v-slot:header>根据筛选条件查询到281822条数据,当前是第1页：</template>
+      <template v-slot:header>根据筛选条件查询到{{total}}条数据,当前是第1页：</template>
 
       <!-- 内容 -->
-      <el-table
-        :data="tableData"
-        style="width: 100%">
-        <el-table-column
-        prop="date"
-        label="封面"
-        width="180">
+      <el-table :data="articles">
+        <el-table-column prop="cover" label="封面">
+          <template v-slot='{row}'>
+            <el-image
+            :src="row.cover.images[0]"
+            fit='cover'
+            style="width: 180px; height: 100px"
+            >
+            <template v-slot:error>
+             <img src="@/assets/error.gif"
+            style="width: 180px; height: 100px" alt="">
+            </template>
+            </el-image>
+          </template>
         </el-table-column>
-        <el-table-column
-        prop="name"
-        label="标题"
-        width="180">
+        <el-table-column prop="title" label="标题"></el-table-column>
+        <el-table-column prop="status" label="状态">
+          <template v-slot="{ row }">
+            <el-tag v-if="row.status===0">草稿</el-tag>
+            <el-tag type="info" v-if="row.status===1">待审核</el-tag>
+            <el-tag type="success" v-if="row.status===2">审核通过</el-tag>
+            <el-tag type="warning" v-if="row.status===3">审核失败</el-tag>
+            <el-tag type="danger" v-if="row.status===4">已删除</el-tag>
+          </template>
         </el-table-column>
-        <el-table-column
-        prop="address"
-        label="状态">
-        </el-table-column>
-        <el-table-column
-        prop="date"
-        label="发布时间"
-        width="180">
-        </el-table-column>
-        <el-table-column
-        prop="date"
-        label="操作"
-        width="180">
+        <el-table-column prop="pubdate" label="发布时间"></el-table-column>
+        <el-table-column prop="id" label="操作">
+          <template slot-scope="scope">
+              <el-button @click="edit(scope.row)" type="primary" icon="el-icon-edit"  size="small" circle></el-button>
+           <el-button type="danger" icon="el-icon-delete"  size="small" circle></el-button>
+          </template>
         </el-table-column>
       </el-table>
     </el-card>
@@ -89,6 +94,7 @@
 </template>
 
 <script>
+import { getArticleList } from '@/Api/article'
 export default {
   name: 'Articles',
   data () {
@@ -99,23 +105,25 @@ export default {
         date: ''
 
       },
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }]
+      // 存放文章列表
+      articles: [
+
+      ],
+      // 存放文章总数
+      total: 0
+    }
+  },
+  async created () {
+    const res = await getArticleList({
+      per_page: 30
+    })
+    console.log(res)
+    this.articles = res.data.data.results
+    this.total = res.data.data.total_count
+  },
+  methods: {
+    edit (row) {
+      console.log(row)
     }
   }
 }
