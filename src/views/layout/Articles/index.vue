@@ -12,48 +12,49 @@
         <!-- 内容 -->
    <el-form :model="form" label-width="80px">
    <el-form-item label="状态">
-    <el-radio-group v-model="form.resource">
-      <el-radio label="全部"></el-radio>
-      <el-radio label="草稿"></el-radio>
-      <el-radio label="待审核"></el-radio>
-      <el-radio label="审核通过"></el-radio>
-      <el-radio label="审核失败"></el-radio>
-      <el-radio label="已删除"></el-radio>
+    <el-radio-group v-model="form.status">
+      <el-radio label="">全部</el-radio>
+      <el-radio label="0">草稿</el-radio>
+      <el-radio label="1">待审核</el-radio>
+      <el-radio label="2">审核通过</el-radio>
+      <el-radio label="3">审核失败</el-radio>
+      <el-radio label="4">已删除</el-radio>
     </el-radio-group>
     </el-form-item>
 
     <el-form-item label="频道">
-    <el-select v-model="form.region" placeholder="选择频道">
-      <el-option label="区域一" value="shanghai"></el-option>
-      <el-option label="区域二" value="beijing"></el-option>
-      <el-option label="区域二" value="beijing"></el-option>
-      <el-option label="区域二" value="beijing"></el-option>
-      <el-option label="区域二" value="beijing"></el-option>
-      <el-option label="区域二" value="beijing"></el-option>
-      <el-option label="区域二" value="beijing"></el-option>
+    <el-select v-model="form.channel_id" placeholder="选择频道" clearable>
+      <el-option
+      :label="item.name"
+      :value="item.id"
+      v-for="item in channels"
+      :key="item.id"
+      ></el-option>
     </el-select>
       </el-form-item>
-    <el-form-item label="活动时间">
+    <el-form-item label="日期">
     <el-date-picker
       v-model="form.date"
-      type="datetimerange"
-      :picker-options="pickerOptions"
+      type="daterange"
       range-separator="至"
       start-placeholder="开始日期"
       end-placeholder="结束日期"
-      align="right">
+      value-format="yyyy-MM-dd">
     </el-date-picker>
     </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="query" :loading="loading">查询</el-button>
       </el-form-item>
       </el-form>
     </el-card>
 
 <!-- 下表格 -->
-    <el-card style="margin-top: 40px;">
+    <el-card
+      style="margin-top: 40px;"
+      v-loading="loading"
+      element-loading-text="拼命加载中...">
       <!-- 表头 -->
-      <template v-slot:header>根据筛选条件查询到{{total}}条数据,当前是第1页：</template>
+      <template v-slot:header>根据筛选条件查询到{{total}}条数据,当前是第{{page}}页：</template>
 
       <!-- 内容 -->
       <el-table :data="articles">
@@ -88,42 +89,92 @@
            <el-button type="danger" icon="el-icon-delete"  size="small" circle></el-button>
           </template>
         </el-table-column>
+
       </el-table>
+      <el-pagination
+       background
+      :current-page="currentPage4"
+      :page-sizes="[10, 20, 30, 40, 50]"
+      :page-size="100"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      @current-change='handleCrrentChange'
+      @size-change='handleSizeChange'
+      >
+        </el-pagination>
     </el-card>
   </div>
 </template>
 
 <script>
-import { getArticleList } from '@/Api/article'
+import { getArticleList, getChannelList } from '@/Api/article'
 export default {
   name: 'Articles',
   data () {
     return {
       form: {
-        resource: '',
-        region: '',
+        status: '',
+        channel_id: '',
         date: ''
 
       },
       // 存放文章列表
-      articles: [
-
-      ],
+      articles: [],
+      channels: [],
       // 存放文章总数
-      total: 0
+      total: 0,
+      page: 1,
+      per_page: 10,
+      loading: false
+
     }
   },
-  async created () {
-    const res = await getArticleList({
-      per_page: 30
-    })
-    console.log(res)
-    this.articles = res.data.data.results
-    this.total = res.data.data.total_count
+  created () {
+    this.getArticles()
+    this.getChannelList()
   },
   methods: {
+    async getChannelList () {
+      const res = await getChannelList()
+      this.channels = res.data.data.channels
+    },
+    async getArticles () {
+      this.loading = true
+      try {
+        // 结构赋值，因为在筛选条件时是日期范围，所以后台返回的日期数据是一个数组，
+        // 注：axios会默认忽略值为null和undefined的属性
+        const [begin, end] = this.form.date || []
+        const res = await getArticleList({
+          // 每页显示多少条数据
+          per_page: this.per_page,
+          // 当前页数
+          page: this.page,
+          begin_pubdate: begin,
+          end_pubdate: end,
+          status: this.form.status || null,
+          channel_id: this.form.channel_id || null
+        })
+        this.articles = res.data.data.results
+        this.total = res.data.data.total_count
+      } catch {
+        this.$message.error('服务器繁忙，请稍后再试')
+      }
+      this.loading = false
+    },
     edit (row) {
-      console.log(row)
+    },
+    handleCrrentChange (value) {
+      this.page = value
+      this.getArticles()
+    },
+    handleSizeChange (size) {
+      this.per_page = size
+      this.page = 1
+      this.getArticles()
+    },
+    query () {
+      this.page = 1
+      this.getArticles()
     }
   }
 }
