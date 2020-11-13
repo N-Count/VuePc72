@@ -14,3 +14,9 @@ export const getChannelList = () => {
     url: '/mp/v1_0/channels'
   })
 }
+export const delArticle = (id) => {
+  return axios({
+    method: 'DELETE',
+    url: `/mp/v1_0/articles/${id}`
+  })
+}
