@@ -4,10 +4,7 @@
     <el-card>
       <div slot="header">
         <!-- 路径导航（面包屑导航） -->
-        <el-breadcrumb separator-class="el-icon-arrow-right">
-         <el-breadcrumb-item to="/">首页</el-breadcrumb-item>
-         <el-breadcrumb-item>内容管理</el-breadcrumb-item>
-        </el-breadcrumb>
+        <Hm-breadcrumb>内容管理</Hm-breadcrumb>
       </div>
         <!-- 内容 -->
    <el-form :model="form" label-width="80px">
