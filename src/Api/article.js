@@ -20,3 +20,14 @@ export const delArticle = (id) => {
     url: `/mp/v1_0/articles/${id}`
   })
 }
+// 添加文章
+export const addArticle = (draft, data) => {
+  return axios({
+    method: 'POST',
+    url: '/mp/v1_0/articles',
+    data,
+    params: {
+      draft
+    }
+  })
+}

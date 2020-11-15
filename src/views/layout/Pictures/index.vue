@@ -112,7 +112,7 @@ export default {
       // this.getPictures()
       // 不取消收藏，直接通过取反来使收藏按钮变回白色
       item.is_collected = !item.is_collected
-      this.$message.success(item.is_collected ? '取消收藏成功' : '收藏成功')
+      this.$message.success(!item.is_collected ? '取消收藏成功' : '收藏成功')
     },
     async del (id) {
       try {
