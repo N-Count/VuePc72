@@ -1,6 +1,6 @@
 <template>
     <div class="home">
-home
+    <hm-cover></hm-cover>
     </div>
 </template>
 <script>

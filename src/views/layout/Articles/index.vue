@@ -20,14 +20,7 @@
     </el-form-item>
 
     <el-form-item label="频道">
-    <el-select v-model="form.channel_id" placeholder="选择频道" clearable>
-      <el-option
-      :label="item.name"
-      :value="item.id"
-      v-for="item in channels"
-      :key="item.id"
-      ></el-option>
-    </el-select>
+   <hm-channels v-model="form.channel_id"></hm-channels>
       </el-form-item>
     <el-form-item label="日期">
     <el-date-picker
@@ -104,7 +97,7 @@
 </template>
 
 <script>
-import { getArticleList, getChannelList, delArticle } from '@/Api/article'
+import { getArticleList, delArticle } from '@/Api/article'
 export default {
   name: 'Articles',
   data () {
@@ -116,7 +109,6 @@ export default {
       },
       // 存放文章列表
       articles: [],
-      channels: [],
       // 存放文章总数
       total: 0,
       page: 1,
@@ -127,13 +119,9 @@ export default {
   },
   created () {
     this.getArticles()
-    this.getChannelList()
   },
   methods: {
-    async getChannelList () {
-      const res = await getChannelList()
-      this.channels = res.data.data.channels
-    },
+
     async getArticles () {
       this.loading = true
       try {

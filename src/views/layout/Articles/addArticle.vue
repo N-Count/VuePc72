@@ -8,8 +8,14 @@
           <el-form-item label="标题" prop="title">
             <el-input placeholder="请输入标题" v-model="form.title"> </el-input>
           </el-form-item>
-          <el-form-item label="内容" prop="content">
-            <el-input placeholder="请输入文章内容" v-model="form.content" type="textarea" :rows="10"> </el-input>
+           <el-form-item label="内容" prop="content">
+         <quill-editor
+            v-model="form.content"
+            placeholder="请输入文章的内容"
+            :options="editorOption"
+            @change="change"
+            @blur="change"
+          ></quill-editor>
           </el-form-item>
             <el-form-item label="封面">
                 <el-radio-group v-model="form.cover.type">
@@ -20,13 +26,7 @@
                 </el-radio-group>
           </el-form-item>
           <el-form-item label="频道" prop="channel_id" >
-           <el-select v-model="form.channel_id" placeholder="请选择频道" clearable>
-             <el-option
-            :label="item.name"
-            v-for="item in channels"
-            :key='item.id'
-            :value='item.id'></el-option>
-           </el-select>
+             <hm-channels v-model="form.channel_id"></hm-channels>
           </el-form-item>
           <el-form-item>
              <el-button type="primary" @click="add(false)">发表</el-button>
@@ -37,9 +37,9 @@
 </div>
 </template>
 <script>
-import { getChannelList, addArticle } from '@/Api/article'
+import { addArticle } from '@/Api/article'
 export default {
-  name: 'AddArticles',
+  name: 'AddArticle',
   data () {
     return {
       form: {
@@ -47,7 +47,7 @@ export default {
         content: '',
         cover: {
           type: 0,
-          image: []
+          images: []
         },
         channel_id: ''
       },
@@ -58,41 +58,76 @@ export default {
         ],
         content: [
           { required: true, message: '文章内容不能为空', trigger: ['blur', 'change'] },
-          { min: 20, message: '文章内容不能低于20个字符', trigger: ['blur', 'change'] }
+          {
+            validator: (rule, value, callback) => {
+              if (value.replace(/<[^>]+>/g, '').length < 20) {
+                callback(new Error('文章内容不能少于20个字符'))
+              } else {
+                callback()
+              }
+            },
+            trigger: ['blur', 'change']
+          }
         ],
         channel_id: [
           { required: true, message: '请选择频道！', trigger: ['blur', 'change'] }
         ]
 
       },
-      channels: []
+      editorOption: {
+        placeholder: '请输入文章内容',
+        modules: {
+          toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ header: 1 }, { header: 2 }], // custom button values
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+            [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+            [{ align: [] }],
+            ['clean']
+          ]
+        }
+      }
     }
   },
-  created () {
-    this.getChannels()
-  },
+
   methods: {
-    async getChannels () {
-      const res = await getChannelList()
-      this.channels = res.data.data.channels
-      console.log(res)
-    },
     async add (draft) {
-      // 对整体表单进行校验
       try {
         await this.$refs.form.validate()
-      } catch {
+      } catch (error) {
         return
       }
-      console.log('校验成功了发送请求了')
+      console.log('校验成功')
       const res = await addArticle(draft, this.form)
       console.log(res)
-      this.$message.success('发表文章成功')
-      this.$router.push('/articles')
+      this.$message.success('发表成功')
+    },
+    change () {
+      this.$refs.form.validateField('content')
     }
   }
 }
 </script>
 <style scoped lang="less">
-
+.hm-cover {
+  float: left;
+  margin-right: 20px;
+}
+.AddArticle {
+  ::v-deep {
+    .ql-editor {
+      height: 300px;
+    }
+    .ql-editor.ql-blank::before {
+      color: rgba(0,0,0,0.3);
+      font-style: normal;
+    }
+    .ql-snow .ql-color-picker .ql-picker-label svg,
+    .ql-snow .ql-icon-picker .ql-picker-label svg {
+      float: right;
+    }
+  }
+}
 </style>
