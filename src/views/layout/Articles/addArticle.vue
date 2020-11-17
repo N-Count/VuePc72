@@ -102,13 +102,14 @@ export default {
     async add (draft) {
       try {
         await this.$refs.form.validate()
-      } catch (error) {
+      } catch {
         return
       }
       console.log('校验成功')
       const res = await addArticle(draft, this.form)
       console.log(res)
       this.$message.success('发表成功')
+      this.$router.push('/articles')
     },
     change () {
       this.$refs.form.validateField('content')

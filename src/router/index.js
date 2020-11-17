@@ -8,6 +8,7 @@ import AddArticle from '@/views/layout/Articles/addArticle'
 import Pictrues from '@/views/layout/Pictures/index'
 import NotFound from '@/views/NotFound/index'
 import { getToken } from '@/utils/storage'
+import Comments from '@/views/layout/Comments/index'
 Vue.use(VueRouter)
 
 const routes = [
@@ -40,6 +41,11 @@ const routes = [
         name: 'Pictrues',
         path: '/pictrues',
         component: Pictrues
+      },
+      {
+        name: 'Comments',
+        path: '/comments',
+        component: Comments
       }
     ]
   },

@@ -79,6 +79,7 @@ export default {
       total: 0,
       selectedImage: '',
       uploadImage: '',
+      // 显示的图片地址
       showImage: this.value || img,
       headers: {
         Authorization: 'Bearer ' + getToken()
@@ -101,7 +102,6 @@ export default {
         per_page: this.per_page,
         collect: this.collect
       })
-      console.log(res)
       const { results, total_count } = res.data.data
       this.pictures = results
       this.total = total_count

@@ -26,11 +26,11 @@
        <i class="el-icon-picture"></i>
         <span slot="title">素材管理</span>
       </el-menu-item>
-       <el-menu-item index="addArticle">
+       <el-menu-item index="/addArticle">
        <i class="el-icon-s-promotion"></i>
         <span slot="title">发布文章</span>
       </el-menu-item>
-       <el-menu-item index="5">
+       <el-menu-item index="/comments">
        <i class="el-icon-chat-dot-round"></i>
         <span slot="title">评论管理</span>
       </el-menu-item>
