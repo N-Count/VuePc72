@@ -18,13 +18,18 @@
           ></quill-editor>
           </el-form-item>
             <el-form-item label="封面">
-                <el-radio-group v-model="form.cover.type">
+                <el-radio-group v-model="form.cover.type" @change="changeType">
                     <el-radio :label="1">单图</el-radio>
                     <el-radio :label="3">三图</el-radio>
                     <el-radio :label="0">无图</el-radio>
                     <el-radio :label="-1">自动</el-radio>
                 </el-radio-group>
           </el-form-item>
+          <el-form-item v-if="form.cover.type > 0" >
+          <hm-cover v-for="(item,index) in form.cover.type" :key="item"  v-model="form.cover.images[index]">
+          </hm-cover>
+          </el-form-item>
+
           <el-form-item label="频道" prop="channel_id" >
              <hm-channels v-model="form.channel_id"></hm-channels>
           </el-form-item>
@@ -107,6 +112,9 @@ export default {
     },
     change () {
       this.$refs.form.validateField('content')
+    },
+    changeType () {
+      this.form.cover.images = []
     }
 
   }

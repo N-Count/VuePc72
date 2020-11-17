@@ -1,8 +1,8 @@
 <template>
-  <div class="my-cover">
+  <div class="hm-cover">
     <!-- 图片按钮 -->
     <div class="btn_img" @click="openDialig">
-      <img src="@/assets/default.png" />
+      <img :src='showImage' >
     </div>
     <el-dialog
         title="上传封面"
@@ -10,7 +10,7 @@
         width="720px">
         <el-tabs v-model="activeName" type='card'>
         <el-tab-pane label="素材库" name="picture">
-          <el-radio-group v-model="collect">
+          <el-radio-group v-model="collect" @change="change">
            <el-radio-button :label="false">全部</el-radio-button>
            <el-radio-button :label="true">收藏</el-radio-button>
           </el-radio-group>
@@ -46,8 +46,8 @@
           name="image"
           :show-file-list="false"
           :on-success="success"
-          :before-upload="beforeUpload"
-          >
+          :on-error="error"
+          :before-upload="beforeUpload">
           <img :src="uploadImage" alt="" v-if='uploadImage' class="avatar" >
             <i v-else  class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
@@ -55,7 +55,7 @@
         </el-tabs>
      <template slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="dialogVisible = false" >确 定</el-button>
+    <el-button type="primary" @click="confirm" >确 定</el-button>
   </template>
 </el-dialog>
   </div>
@@ -64,7 +64,9 @@
 <script>
 import { getPictureList } from '@/Api/pictures'
 import { getToken } from '@/utils/storage'
+import img from '@/assets/default.png'
 export default {
+  props: ['value'],
   data () {
     return {
     // 控制对话框显示隐藏
@@ -77,9 +79,15 @@ export default {
       total: 0,
       selectedImage: '',
       uploadImage: '',
+      showImage: this.value || img,
       headers: {
         Authorization: 'Bearer ' + getToken()
       }
+    }
+  },
+  watch: {
+    value () {
+      this.showImage = this.value || img
     }
   },
   methods: {
@@ -90,7 +98,8 @@ export default {
     async getPictures () {
       const res = await getPictureList({
         page: this.page,
-        per_page: this.per_page
+        per_page: this.per_page,
+        collect: this.collect
       })
       console.log(res)
       const { results, total_count } = res.data.data
@@ -115,6 +124,35 @@ export default {
       if (file.size / 1024 / 1024 > 2) {
         return this.$message.warning('上传的照片不能超过2兆!')
       }
+    },
+    error () {
+      this.$message.error('上传失败，请稍后重试！')
+    },
+    confirm () {
+      if (this.activeName === 'picture') {
+        if (this.selectedImage) {
+          this.showImage = this.selectedImage
+          this.$message.success('上传成功！')
+        } else {
+          return this.$message.error('请选择图片！')
+        }
+      } else {
+        if (this.uploadImage) {
+          this.showImage = this.uploadImage
+          this.dialogVisible = false
+          this.$message.success('上传成功！')
+        } else {
+          return this.$message.error('请上传图片！')
+        }
+      }
+      this.dialogVisible = false
+      this.selectedImage = ''
+      this.uploadImage = ''
+      this.$emit('input', this.showImage)
+    },
+    change () {
+      this.page = 1
+      this.getPictures()
     }
 
   }
@@ -131,6 +169,7 @@ export default {
     width: 100%;
     height: 100%;
     display: block;
+   object-fit: cover;
   }
 }
 .el-row {
