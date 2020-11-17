@@ -38,6 +38,7 @@
 </template>
 <script>
 import { addArticle } from '@/Api/article'
+
 export default {
   name: 'AddArticle',
   data () {
@@ -107,6 +108,7 @@ export default {
     change () {
       this.$refs.form.validateField('content')
     }
+
   }
 }
 </script>

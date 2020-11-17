@@ -8,32 +8,115 @@
         title="上传封面"
         :visible.sync="dialogVisible"
         width="720px">
-        <el-tabs v-model="activeName" type='card' @click="handleClick">
-        <el-tab-pane label="素材库" name="1">素材库</el-tab-pane>
-        <el-tab-pane label="上传图片" name="2">上传图片</el-tab-pane>
+        <el-tabs v-model="activeName" type='card'>
+        <el-tab-pane label="素材库" name="picture">
+          <el-radio-group v-model="collect">
+           <el-radio-button :label="false">全部</el-radio-button>
+           <el-radio-button :label="true">收藏</el-radio-button>
+          </el-radio-group>
+          <el-row :gutter="10">
+            <el-col
+            v-for='item in pictures'
+            :key='item.id'
+            :span='6'
+           @click.native="selected(item.url)">
+              <el-image
+              :class = "{ selected:item.url === selectedImage }"
+              :src="item.url"
+              style="height: 120px; width: 100%"
+              fit='cover'>
+              </el-image>
+            </el-col>
+          </el-row>
+          <el-pagination
+          @current-change="handleCurrentChange"
+          layout="total,prev,pager,next,jumper"
+          :current-page="page"
+          :page-size="per_page"
+          :total="total"
+          >
+
+          </el-pagination>
+        </el-tab-pane>
+        <el-tab-pane label="上传图片" name="upload">
+          <el-upload
+          class="avatar-uploader"
+          action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+          :headers="headers"
+          name="image"
+          :show-file-list="false"
+          :on-success="success"
+          :before-upload="beforeUpload"
+          >
+          <img :src="uploadImage" alt="" v-if='uploadImage' class="avatar" >
+            <i v-else  class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-tab-pane>
         </el-tabs>
      <template slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+    <el-button type="primary" @click="dialogVisible = false" >确 定</el-button>
   </template>
 </el-dialog>
   </div>
 </template>
 
 <script>
+import { getPictureList } from '@/Api/pictures'
+import { getToken } from '@/utils/storage'
 export default {
   data () {
     return {
     // 控制对话框显示隐藏
       dialogVisible: false,
-      activeName: 'image'
-
+      activeName: 'picture',
+      collect: false,
+      pictures: [],
+      page: 1,
+      per_page: 8,
+      total: 0,
+      selectedImage: '',
+      uploadImage: '',
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      }
     }
   },
   methods: {
     openDialig () {
       this.dialogVisible = true
+      this.getPictures()
+    },
+    async getPictures () {
+      const res = await getPictureList({
+        page: this.page,
+        per_page: this.per_page
+      })
+      console.log(res)
+      const { results, total_count } = res.data.data
+      this.pictures = results
+      this.total = total_count
+    },
+    handleCurrentChange (val) {
+      this.page = val
+      this.getPictures()
+    },
+    selected (url) {
+      if (this.selectedImage === url) {
+        this.selectedImage = ''
+      } else {
+        this.selectedImage = url
+      }
+    },
+    success (res) {
+      this.uploadImage = res.data.url
+    },
+    beforeUpload (file) {
+      if (file.size / 1024 / 1024 > 2) {
+        return this.$message.warning('上传的照片不能超过2兆!')
+      }
     }
+
   }
 }
 </script>
@@ -49,5 +132,22 @@ export default {
     height: 100%;
     display: block;
   }
+}
+.el-row {
+  margin-top: 10px;
+  .el-col {
+    margin-top: 5px;
+  }
+}
+.selected {
+   &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:  rgba(0, 0, 0, 0.4) url('~@/assets/selected.png') no-repeat center / 60px 60px;
+}
 }
 </style>
