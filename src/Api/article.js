@@ -31,3 +31,15 @@ export const addArticle = (draft, data) => {
     }
   })
 }
+export const updateCommentStatus = (article_id, allow_comment) => {
+  return axios({
+    method: 'PUT',
+    url: '/mp/v1_0/comments/status',
+    params: {
+      article_id
+    },
+    data: {
+      allow_comment
+    }
+  })
+}
