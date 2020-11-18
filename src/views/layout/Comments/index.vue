@@ -37,21 +37,19 @@
 
 <script>
 import { getArticleList, updateCommentStatus } from '@/Api/article'
+import page from '@/mixins/page'
 export default {
+  mixins: [page],
   name: 'Comments',
   data () {
     return {
       comments: [],
-      total: 0,
-      page: 1,
-      per_page: 10
+      loading: false
     }
   },
-  created () {
-    this.getComments()
-  },
+
   methods: {
-    async getComments () {
+    async getList () {
       this.loading = true
       const res = await getArticleList({
         page: this.page,
@@ -65,10 +63,6 @@ export default {
     },
     indexMethod (index) {
       return index + 1 + (this.page - 1) * this.per_page
-    },
-    handleCurrentChange (val) {
-      this.page = val
-      this.getComments()
     },
     async updateComment (row, status) {
       try {

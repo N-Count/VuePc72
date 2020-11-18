@@ -16,3 +16,11 @@ export const getUserInfo = () => {
 
   })
 }
+export const getFansList = (params) => {
+  return request({
+    url: '/mp/v1_0/followers',
+    method: 'GET',
+    params
+
+  })
+}
