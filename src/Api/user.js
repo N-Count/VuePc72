@@ -21,6 +21,8 @@ export const getFansList = (params) => {
     url: '/mp/v1_0/followers',
     method: 'GET',
     params
-
   })
+}
+export const getFollowers = () => {
+  return request.get('/mp/v1_0/statistics/followers')
 }

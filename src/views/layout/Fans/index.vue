@@ -5,7 +5,7 @@
               <Hm-breadcrumb>粉丝管理</Hm-breadcrumb>
         </template>
         <template>
-          <el-tabs type='card' v-model="activeName">
+          <el-tabs type='card' v-model="activeName" @tab-click="handleClick">
             <el-tab-pane name='fans' label="粉丝管理">
               <el-row :gutter="10">
                   <el-col :span="2" v-for="item in fans" :key="item.id.toString()">
@@ -26,13 +26,13 @@
                 >
                </el-pagination>
             </el-tab-pane>
-            <el-tab-pane name='chart' label="粉丝报表">
+
+            <el-tab-pane name='chart' label="粉丝报表" >
                 <el-row>
                <el-col :span="12">
-              <div ref="chart" class="chart">123</div>
-            </el-col>
-            <el-col :span="12">
-              <div ref="chartPie" class="chart"></div>
+              <div ref="chart" class="chart">
+
+              </div>
             </el-col>
              </el-row>
             </el-tab-pane>
@@ -44,8 +44,9 @@
 </template>
 
 <script>
-import { getFansList } from '@/Api/user'
+import { getFansList, getFollowers } from '@/Api/user'
 import page from '@/mixins/page'
+import echarts from 'echarts'
 export default {
   mixins: [page],
   data () {
@@ -66,9 +67,52 @@ export default {
       const { results, total_count } = res.data.data
       this.fans = results
       this.total = total_count
+    },
+    async handleClick () {
+      try {
+        if (this.activeName === 'chart') {
+          const res = await getFollowers()
+          console.log(res)
+          this.draw(res.data.data.age)
+        }
+      } catch (error) {
+        return this.$message.error('服务器繁忙，请重试！')
+      }
+    },
+    draw (data) {
+    // 初始化echarts
+      const xArr = []
+      const yArr = []
+      for (const k in data) {
+        xArr.push(k.replace('le', '小于').replace('gt', '大于') + '岁')
+        yArr.push(data[k])
+      }
+      const myChart = echarts.init(this.$refs.chart)
+      const option = {
+        xAxis: {
+          type: 'category',
+          data: xArr
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          data: yArr,
+          type: 'bar',
+          showBackground: true,
+          backgroundStyle: {
+            color: 'rgba(220, 220, 220, 0.8)'
+          }
+        }]
+      }
+      myChart.setOption(option)
+
+    // 使用刚指定的配置项和数据显示图表。
     }
   }
+
 }
+
 </script>
 
 <style scoped lang='less'>
@@ -87,7 +131,7 @@ export default {
   }
 }
 .chart {
-  width: 700px;
+  width: 600px;
   height: 400px;
 }
 </style>
