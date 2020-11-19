@@ -49,7 +49,7 @@
       <!-- 内容 -->
       <el-table :data="articles">
         <el-table-column prop="cover" label="封面">
-          <template v-slot='{row}'>
+          <template v-slot='{ row }'>
             <el-image
             :src="row.cover.images[0]"
             fit='cover'
@@ -75,7 +75,7 @@
         <el-table-column prop="pubdate" label="发布时间"></el-table-column>
         <el-table-column prop="id" label="操作">
           <template slot-scope="scope">
-              <el-button @click="edit(scope.row)" type="primary" icon="el-icon-edit"  size="small" circle></el-button>
+              <el-button  @click="edit(scope.row)" type="primary" icon="el-icon-edit"  size="small" circle></el-button>
            <el-button type="danger" icon="el-icon-delete"  size="small" circle @click="del(scope.row.id,scope.row.status)"></el-button>
           </template>
         </el-table-column>
@@ -105,7 +105,7 @@ export default {
       form: {
         status: '',
         channel_id: '',
-        date: ''
+        date: []
       },
       // 存放文章列表
       articles: [],
@@ -146,6 +146,10 @@ export default {
       this.loading = false
     },
     edit (row) {
+      if (row.status === 0) {
+        return this.$message.warning('草稿不能修改，只能删除')
+      }
+      this.$router.push('/editArticles/' + row.id.toString())
     },
     handleCrrentChange (value) {
       this.page = value
@@ -160,6 +164,7 @@ export default {
       this.page = 1
       this.getArticles()
     },
+
     async del (id, status) {
       if (status === 2) {
         return this.$message.warning('审核通过的文章不允许删除')

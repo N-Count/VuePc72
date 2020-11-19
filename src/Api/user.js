@@ -16,6 +16,13 @@ export const getUserInfo = () => {
 
   })
 }
+export const updateUserInfo = (data) => {
+  return request({
+    url: '/mp/v1_0/user/profile',
+    method: 'PATCH',
+    data
+  })
+}
 export const getFansList = (params) => {
   return request({
     url: '/mp/v1_0/followers',
@@ -25,4 +32,11 @@ export const getFansList = (params) => {
 }
 export const getFollowers = () => {
   return request.get('/mp/v1_0/statistics/followers')
+}
+export const updateUserImage = (fd) => {
+  return request({
+    url: '/mp/v1_0/user/photo',
+    method: 'PATCH',
+    data: fd
+  })
 }

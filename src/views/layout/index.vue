@@ -88,6 +88,11 @@ export default {
   async created () {
     const res = await getUserInfo()
     this.userInfo = res.data.data
+    // 监听updatename事件
+    this.$bus.$on('updataInfo', (name, photo) => {
+      this.userInfo.name = name
+      this.userInfo.photo = photo
+    })
   },
   methods: {
     async logout () {

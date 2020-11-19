@@ -8,6 +8,13 @@ export const getArticleList = (params = {}) => {
 
   })
 }
+export const getArticleInfo = id => {
+  return axios({
+    method: 'GET',
+    url: '/mp/v1_0/articles/' + id
+
+  })
+}
 export const getChannelList = () => {
   return axios({
     method: 'GET',

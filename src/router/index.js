@@ -5,6 +5,7 @@ import layout from '@/views/layout/index'
 import Home from '@/views/layout/Home/index'
 import Articles from '@/views/layout/Articles/index'
 import AddArticle from '@/views/layout/Articles/addArticle'
+import EditArticles from '@/views/layout/Articles/editArticle'
 import Pictrues from '@/views/layout/Pictures/index'
 import NotFound from '@/views/NotFound/index'
 import { getToken } from '@/utils/storage'
@@ -38,6 +39,11 @@ const routes = [
         name: 'AddArticle',
         path: '/addArticle',
         component: AddArticle
+      },
+      {
+        name: 'EditArticles',
+        path: '/editarticles/:id',
+        component: EditArticles
       },
       {
         name: 'Pictrues',
