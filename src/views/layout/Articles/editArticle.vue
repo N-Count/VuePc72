@@ -34,14 +34,14 @@
              <hm-channels v-model="form.channel_id"></hm-channels>
           </el-form-item>
           <el-form-item>
-             <el-button type="primary" @click="add(false)">修改</el-button>
+             <el-button type="primary" @click="edit">修改</el-button>
           </el-form-item>
       </el-form>
     </el-card>
 </div>
 </template>
 <script>
-import { addArticle, getArticleInfo } from '@/Api/article'
+import { editArticle, getArticleInfo } from '@/Api/article'
 
 export default {
   name: 'AddArticle',
@@ -103,23 +103,16 @@ export default {
   },
 
   methods: {
-    async add (draft) {
-      try {
-        await this.$refs.form.validate()
-      } catch {
-        return
-      }
-      console.log('校验成功')
-      const res = await addArticle(draft, this.form)
-      console.log(res)
-      this.$message.success('发表成功')
-      this.$router.push('/articles')
-    },
+
     change () {
       this.$refs.form.validateField('content')
     },
     changeType () {
       this.form.cover.images = []
+    },
+    async edit () {
+      await editArticle(this.form)
+      this.$router.push('/articles')
     }
 
   }

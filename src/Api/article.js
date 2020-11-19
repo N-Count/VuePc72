@@ -38,6 +38,16 @@ export const addArticle = (draft, data) => {
     }
   })
 }
+export const editArticle = (data) => {
+  return axios({
+    method: 'PUT',
+    url: '/mp/v1_0/articles/' + data.id,
+    data,
+    params: {
+      draft: false
+    }
+  })
+}
 export const updateCommentStatus = (article_id, allow_comment) => {
   return axios({
     method: 'PUT',
